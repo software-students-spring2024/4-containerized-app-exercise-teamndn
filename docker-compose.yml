@@ -1,0 +1,16 @@
+services:
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    networks: network
+    
+  web-app:
+    build: ./web-app
+    ports: 
+      - "5000:5000"
+    networks: network
+
+  ml-client:
+    build: ./machine-learning-client
+    networks: network
