@@ -13,7 +13,7 @@ db = connection['start']
 while True:
     pics = db.pictures.find({ "faceCount" : { "$exists" : False } })
     for pic in pics:
-        ans = count_faces(pic)
+        ans = faceCounter(pic)
         db.pictures.update_one(
             {"_id": pic["_id"]},
             {"$set": {"faceCount": ans}}  
