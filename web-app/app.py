@@ -1,31 +1,35 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, request, jsonify, render_template
+from flask_socketio import SocketIO
 from pymongo import MongoClient
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
-#SetTING up a connection to the local MongoDB
-mongo_uri = "mongodb://localhost:27017/"
-client = MongoClient(mongo_uri)
 
-#Database and collection.
-db = client['people_counter_app']
-collection = db['people_counts']
+# mongoDB client set up
+mongo_client = MongoClient('mongodb://localhost:27017/') 
+db = mongo_client['people_counter']  # database name for the number of people 
+collection = db['images']  # collection where all the images will be stored 
 
 @app.route('/')
 def index():
-    # Retrieve the latest count from the database.
-    latest_count = collection.find_one(sort=[('_id', -1)])
-    count = latest_count['count'] if latest_count else 0
-    return render_template('index.html', count=count)
+    return render_template('index.html')
 
-@app.route('/update', methods=['POST'])
-def update_count():
-    if not request.json or 'count' not in request.json:
-        return jsonify({'error': 'Bad Request', 'message': 'No count provided.'}), 400
+@app.route('/capture', methods=['POST'])
+def capture_image():
+    image_data = request.data  # the images come as raw data 
+    # plugging in the image data on mongoDB
+    result = collection.insert_one({'image': image_data})
+    return jsonify({"message": "Image captured and saved", "id": str(result.inserted_id)})
 
-    count = request.json['count']
-    collection.insert_one({'count': count})
-    return jsonify({'message': 'Count updated successfully!', 'count': count}), 200
+# socketIO set up
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected')
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
