@@ -1,15 +1,16 @@
 from flask import Flask, request, jsonify, render_template
 from flask_socketio import SocketIO
 from pymongo import MongoClient
+import base64
 
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-
-# mongoDB client set up
-mongo_client = MongoClient('mongodb://localhost:27017/') 
-db = mongo_client['people_counter']  # database name for the number of people 
-collection = db['images']  # collection where all the images will be stored 
+# mongoDB client setup
+mongo_client = MongoClient('mongodb://localhost:27017/')
+db = mongo_client['people_counter']
+unprocessed_images = db['unprocessed_images']  # collection for unprocessed images
+processed_data = db['processed_data']  # collection for processed results
 
 @app.route('/')
 def index():
@@ -17,12 +18,21 @@ def index():
 
 @app.route('/capture', methods=['POST'])
 def capture_image():
-    image_data = request.data  # the images come as raw data 
-    # plugging in the image data on mongoDB
-    result = collection.insert_one({'image': image_data})
+    # extracting image data from the POST request
+    image_data = request.get_data().decode('utf-8').split(',')[1]  
+    image_bytes = base64.b64decode(image_data)
+    
+    # saving the image data to the 'unprocessed_images' collection
+    result = unprocessed_images.insert_one({'image': image_bytes})
     return jsonify({"message": "Image captured and saved", "id": str(result.inserted_id)})
 
-# socketIO set up
+@app.route('/results')
+def results():
+    # fetching all entries from the 'processed_data' collection
+    results = list(processed_data.find({}, {'_id': 0}))
+    return render_template('results.html', results=results)
+
+# socketIO event handlers
 @socketio.on('connect')
 def handle_connect():
     print('Client connected')
