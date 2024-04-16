@@ -3,52 +3,40 @@
 
 <head>
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>People Counter Dashboard</title>
-
+    <title>People Counter</title>
     <link rel="stylesheet" href="/static/style.css">
-
 </head>
 
 <body>
     <div class="container">
-        <h1>People Counter Dashboard</h1>
-
+        <h1>People Counter</h1>
         <video id="video" width="640" height="480" autoplay></video>
-
         <button id="snap">Snap Photo</button>
-
         <div id="count-display" class="count-display"></div>
+        
     </div>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
-
     <script>
         const videoElement = document.getElementById('video');
+        const snapping = document.getElementById('snap');
 
-        const snapButton = document.getElementById('snap');
-
-        snapButton.addEventListener('click', function() {
+        snapping.addEventListener('click', function() {
             const canvas = document.createElement('canvas');
-            
             canvas.width = videoElement.videoWidth;
-            
             canvas.height = videoElement.videoHeight;
-            
             canvas.getContext('2d').drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-            
             const imageData = canvas.toDataURL('image/png');
 
             fetch('/capture', {
                 method: 'POST',
                 body: imageData
-            })
-
-            .then(response => response.json())
-                
-            .then(data => console.log(data.message));
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.message === "Image captured and saved") {
+                      window.location.href = '/results'; 
+                  }
+              });
         });
 
         if (navigator.mediaDevices.getUserMedia) {
@@ -56,14 +44,7 @@
                 .then(stream => videoElement.srcObject = stream)
                 .catch(err => console.error("Error: ", err));
         }
-
-        const socket = io.connect('http://' + document.domain + ':' + location.port);
-
-        socket.on('update_count', function(data) {
-            document.getElementById('count-display').textContent = 'People Count: ' + data.count;
-        });
-
     </script>
-    
 </body>
+
 </html>
