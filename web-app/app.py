@@ -8,7 +8,7 @@ socketio = SocketIO(app)
 
 # mongoDB client set up
 mongo_client = MongoClient('mongodb://localhost:27017/')
-db = mongo_client['people_counter']
+db = mongo_client['start']
 unprocessed_images = db['unprocessed_images']  # collection for unprocessed images
 processed_data = db['processed_data']  # collection for processed results
 

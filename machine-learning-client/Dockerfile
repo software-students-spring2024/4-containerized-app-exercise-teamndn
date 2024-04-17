@@ -1,19 +1,21 @@
-# in Docker, it is common to base a new image on a previously-created image
-FROM python:3.8-slim-buster
+# Base image
+FROM python:3.8-slim
 
-# Set the working directory in the image
+# Install necessary dependencies
+RUN apt-get update && apt-get install -y \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+ && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
 WORKDIR /app
 
-# install dependencies into the image - doing this first will speed up subsequent builds, as Docker will cache this step
-COPY requirements.txt ./
-RUN pip3 install -r requirements.txt
+# Copy the Python script into the container
+COPY MLClient.py /app/MLClient.py
 
-# the ADD command is how you add files from your local machine into a Docker image
-# Copy the current directory contents into the container at /app
-ADD . .
+# Install required Python packages
+RUN pip install opencv-python-headless pymongo
 
-# expose the port that the Flask app is running on... by default 5000
-EXPOSE 5002
-
-# Run app.py when the container launches
-CMD [ "python3", "MLClient.py"]
+# Run the script
+CMD ["python", "MLClient.py"]

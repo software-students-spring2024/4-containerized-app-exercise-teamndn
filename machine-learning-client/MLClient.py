@@ -8,10 +8,10 @@ def faceCounter(img):
     return len(faces)
 
 
-connection = pymongo.MongoClient("mongodb://localhost:27017/")
+connection = pymongo.MongoClient("mongodb://mongodb:27017/")
 db = connection['start']
 while True:
-    pics = db.pictures.find({ "faceCount" : { "$exists" : False } })
+    pics = db.unprocessed_images.find({ "faceCount" : { "$exists" : False } })
     for pic in pics:
         ans = faceCounter(pic)
         db.pictures.update_one(

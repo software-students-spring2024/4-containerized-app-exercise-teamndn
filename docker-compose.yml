@@ -3,14 +3,21 @@ services:
     image: mongo
     ports:
       - "27017:27017"
-    networks: network
+    networks: 
+      - network
 
   web-app:
     build: ./web-app
     ports: 
       - "5000:5000"
-    networks: network
+    networks: 
+      - network
 
   ml-client:
     build: ./machine-learning-client
-    networks: network
+    networks: 
+      - network
+      
+networks:
+  network:
+    driver: bridge
