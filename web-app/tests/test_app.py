@@ -1,13 +1,13 @@
 import pytest
+import flask
+from flask_socketio import SocketIO
 from app import app
 class Tests:
     
     def test_client(self):
-        res = app.test_client().get('/')
-        response = res.data.decode('utf-8')
-        print(response)
+        res = app.test_client().post('/capture')
         assert res.status_code == 200
-        assert res
+        assert res.json["message"] == "Image captured and saved"
 
     # def test_update_route(self):
     #     testreq = {'count':'5'}
