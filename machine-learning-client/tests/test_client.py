@@ -13,5 +13,5 @@ class Tests:
 
     def testFaceCounter(self):
         len = faceCounter("tests/test.jpg")
-        assert isinstance(len, int)
+        assert isinstance(len, int), "expected face counter to return int"
         
