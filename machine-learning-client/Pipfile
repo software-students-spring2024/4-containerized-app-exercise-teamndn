@@ -8,6 +8,7 @@ pylint = "*"
 black = "*"
 opencv-python = "*"
 pytest = "*"
+pymongo = "*"
 
 [dev-packages]
 
