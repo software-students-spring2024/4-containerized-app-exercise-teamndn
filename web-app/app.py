@@ -30,7 +30,9 @@ def capture_image():
 def results():
     # fetching all entries from the 'processed_data' collection
     results = list(unprocessed_images.find({}, {'_id': 0}))
-    print(results)
+    for result in results:
+        image_bytes = result['image']
+        result['image_base64'] = base64.b64encode(image_bytes).decode('utf-8')
     return render_template('results.html', results=results)
 
 # socketIO set up

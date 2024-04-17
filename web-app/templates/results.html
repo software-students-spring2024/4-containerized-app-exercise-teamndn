@@ -11,6 +11,9 @@
         <h1>Processed Results</h1>
         <ul>
             {% for result in results %}
+            <div>
+                <img src="data:image/jpeg;base64,{{ result.image_base64 }}" alt="Image">
+            </div>
             <li>People Count: {{ result['faceCount'] }}</li>
             {% endfor %}
         </ul>
