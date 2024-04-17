@@ -5,10 +5,12 @@ from app import app
 class Tests:
     
     def test_client(self):
-        res = app.test_client().post('/capture')
+        """tests client and capture route"""
+        res = app.test_client().post("/capture")
         assert res.status_code == 200
         assert res.json["message"] == "Image captured and saved"
 
+    
     # def test_update_route(self):
     #     testreq = {'count':'5'}
     #     res = app.test_client().post('/update', json=testreq)

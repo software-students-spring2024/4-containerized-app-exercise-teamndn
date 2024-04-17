@@ -19,7 +19,9 @@ def index():
 @app.route('/capture', methods=['POST'])
 def capture_image():
     # extracting image data from the POST request
-    image_data = request.get_data().decode('utf-8').split(',')[1]  
+    image_data = request.get_data().decode('utf-8')
+    if(image_data):
+        image_data = image_data.split(',')[1]  
     image_bytes = base64.b64decode(image_data)
     
     # saving the image data to the 'unprocessed_images' collection
