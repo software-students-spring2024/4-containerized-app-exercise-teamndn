@@ -1,13 +1,13 @@
 from flask import Flask, request, jsonify, render_template
 from flask_socketio import SocketIO
 from pymongo import MongoClient
-import base64
+import base64, os
 
 app = Flask(__name__)
 socketio = SocketIO(app)
 
 # mongoDB client set up
-mongo_client = MongoClient('mongodb://localhost:27017/')
+mongo_client = MongoClient('mongodb://mongodb:27017/')
 db = mongo_client['start']
 unprocessed_images = db['unprocessed_images']  # collection for unprocessed images
 processed_data = db['processed_data']  # collection for processed results
@@ -29,7 +29,8 @@ def capture_image():
 @app.route('/results')
 def results():
     # fetching all entries from the 'processed_data' collection
-    results = list(processed_data.find({}, {'_id': 0}))
+    results = list(unprocessed_images.find({}, {'_id': 0}))
+    print(results)
     return render_template('results.html', results=results)
 
 # socketIO set up
